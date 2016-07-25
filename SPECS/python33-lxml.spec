@@ -5,15 +5,14 @@
 %define real_name python-lxml
 
 Name:           python%{pybase_ver}-lxml
-Version:        3.6.0
+Version:        3.6.1
 Release:        1.ius%{?dist}
 Summary:        ElementTree-like Python bindings for libxml2 and libxslt
 
 Group:          Development/Libraries
 License:        BSD
 URL:            http://codespeak.net/lxml/
-Source0:        http://cheeseshop.python.org/packages/source/l/lxml/lxml-%{version}.tar.gz
-#Source0:        http://codespeak.net/lxml/lxml-%{version}.tgz
+Source0:        https://pypi.io/packages/source/l/lxml/lxml-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  libxslt-devel
@@ -48,6 +47,10 @@ rm -rf %{buildroot}
 %{python_sitearch}/*
 
 %changelog
+* Mon Jul 25 2016 Ben Harper <ben.harper@rackspace.com> - 3.7.0-1.ius
+- Latest upstream
+- update Source0 URL
+
 * Mon Mar 21 2016 Ben Harper <ben.harper@rackspace.com> - 3.6.0-1.ius
 - Latest upstream
 
