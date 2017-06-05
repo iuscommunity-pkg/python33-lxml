@@ -1,50 +1,57 @@
-%define __python /usr/bin/python3.3
-%{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
+%global pypi_name lxml
+%global python python33
 
-%define pybase_ver 33
-%define real_name python-lxml
+# these correspond to the extras_require options in setup.py
+# https://github.com/lxml/lxml/blob/lxml-3.7.2/setup.py#L68-L70
+%bcond_with cssselect
+%bcond_with html5
+%bcond_with htmlsoup
 
-Name:           python%{pybase_ver}-lxml
+Name:           %{python}-%{pypi_name}
 Version:        3.8.0
 Release:        1.ius%{?dist}
-Summary:        ElementTree-like Python bindings for libxml2 and libxslt
-
-Group:          Development/Libraries
+Summary:        XML processing library combining libxml2/libxslt with the ElementTree API
 License:        BSD
-URL:            http://codespeak.net/lxml/
-Source0:        https://pypi.io/packages/source/l/lxml/lxml-%{version}.tar.gz
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+URL:            http://lxml.de
+Source0:        http://lxml.de/files/%{pypi_name}-%{version}.tgz
 
-BuildRequires:  libxslt-devel
-BuildRequires:  python%{pybase_ver}, python%{pybase_ver}-setuptools, python%{pybase_ver}-devel
+# http://lxml.de/installation.html#requirements
+BuildRequires:  libxml2-devel >= 2.7.0
+BuildRequires:  libxslt-devel >= 1.1.23
+BuildRequires:  %{python}-devel
+BuildRequires:  %{python}-setuptools
+
+%{?with_cssselect:Requires: %{python}-cssselect}
+%{?with_html5:Requires: %{python}-html5lib}
+%{?with_htmlsoup:Requires: %{python}-beautifulsoup4}
+
 
 %description
-lxml provides a Python binding to the libxslt and libxml2 libraries.
-It follows the ElementTree API as much as possible in order to provide
-a more Pythonic interface to libxml2 and libxslt than the default
-bindings.  In particular, lxml deals with Python Unicode strings
-rather than encoded UTF-8 and handles memory management automatically,
-unlike the default bindings.
+lxml is a Pythonic, mature binding for the libxml2 and libxslt libraries. It
+provides safe and convenient access to these libraries using the ElementTree It
+extends the ElementTree API significantly to offer support for XPath, RelaxNG,
+XML Schema, XSLT, C14N and much more.To contact the project, go to the project
+home page < or see our bug tracker at case you want to use the current ...
+
 
 %prep
-%setup -q -n lxml-%{version}
+%autosetup -n %{pypi_name}-%{version}
 
-chmod a-x doc/rest2html.py
 
 %build
-%{__python} setup.py build
+CFLAGS="%{optflags}" %{__python3} setup.py build
+
 
 %install
-rm -rf %{buildroot}
-%{__python} setup.py install -O1 --skip-build --root %{buildroot}
+%{__python3} setup.py install --optimize 1 --skip-build --root %{buildroot}
 
-%clean
-rm -rf %{buildroot}
 
 %files
-%defattr(-,root,root,-)
-%doc LICENSES.txt PKG-INFO CREDITS.txt CHANGES.txt doc/
-%{python_sitearch}/*
+%license doc/licenses/ZopePublicLicense.txt LICENSES.txt
+%doc README.rst src/lxml/isoschematron/resources/xsl/iso-schematron-xslt1/readme.txt
+%{python3_sitearch}/%{pypi_name}
+%{python3_sitearch}/%{pypi_name}-%{version}-py?.?.egg-info
+
 
 %changelog
 * Mon Jun 05 2017 Carl George <carl.george@rackspace.com> - 3.8.0-1.ius
@@ -144,7 +151,7 @@ rm -rf %{buildroot}
 * Tue Nov 18 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 2.0.10-1
 - 2.0.10 (2008-11-17)
 - Bugs fixed
-- 
+-
 -    * Ref-count leaks when lxml enters a try-except statement while an
 -      outside exception lives in sys.exc_*(). This was due to a problem
 -      in Cython, not lxml itself.
@@ -152,7 +159,7 @@ rm -rf %{buildroot}
 * Fri Sep  5 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 2.0.9-1
 - 2.0.9 (2008-09-05)
 - Bugs fixed
-- 
+-
 -    * Memory problem when passing documents between threads.
 -    * Target parser did not honour the recover option and raised an exception
 -      instead of calling .close() on the target.
@@ -182,7 +189,7 @@ rm -rf %{buildroot}
 * Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 1.3.6-2
 - Autorebuild for GCC 4.3
 
-* Mon Nov  4 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.3.6-1
+* Sun Nov  4 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.3.6-1
 - Update to 1.3.6.
 
 * Mon Oct 22 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.3.5-1
